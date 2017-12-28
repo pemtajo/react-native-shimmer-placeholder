@@ -51,25 +51,23 @@ class ShimmerPlaceHolder extends Component {
       this.loopAnimated();
     }
   }
-  loopAnimated() {
-    const shimmerAnimated = this.getAnimated();
-    const { visible } = this.props;
-    shimmerAnimated.start(() => {
-      if (!visible) {
-        this.loopAnimated();
-      }
-    })
+  componentWillUnmount() {
+    this.state.beginShimmerPosition.stopAnimation();
+    if (this.animLoop) {
+      this.animFn.stop();
+      this.animLoop.stop();
+    }
   }
-  getAnimated = () => {
-    // this.state.color.setValue(0);
-    this.state.beginShimmerPosition.setValue(-1);
-    return Animated.timing(this.state.beginShimmerPosition, {
+  loopAnimated() {
+    this.animFn = Animated.timing(this.state.beginShimmerPosition, {
       toValue: 1,
       duration: this.props.duration,
       // useNativeDriver: true,
       // easing: Easing.linear,
       // delay: -400
     });
+    this.animLoop = Animated.loop(this.animFn);
+    this.animLoop.start();
   }
   render() {
     const { width, reverse, height, colorShimmer, style, widthShimmer, children, visible, backgroundColorBehindBorder, hasBorder } = this.props;
